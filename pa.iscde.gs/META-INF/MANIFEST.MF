@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Gs
+Bundle-SymbolicName: pa.iscde.gs;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.eclipse.swt;bundle-version="3.104.1",
+ pt.iscte.pidesco;bundle-version="0.1.0"
+Bundle-ActivationPolicy: lazy
+Import-Package: org.osgi.framework
