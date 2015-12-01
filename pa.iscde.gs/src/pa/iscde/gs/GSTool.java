@@ -63,7 +63,7 @@ public class GSTool implements PidescoTool {
 		window.validate();
 	}
 
-
+	
 	private JFrame createWindow() {
 		final JFrame window = new JFrame("Getters and Setters");
 		window.setLayout(new GridLayout(0,1));
@@ -138,6 +138,7 @@ public class GSTool implements PidescoTool {
 	    panel.add(cb1, BorderLayout.NORTH);
 		return panel;
 	}
+	
 	private JPanel createPaneltoString(){
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -161,7 +162,6 @@ public class GSTool implements PidescoTool {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//model.undo();
 			}
 		});
 		JButton cancel = new JButton("Cancel");
@@ -169,7 +169,6 @@ public class GSTool implements PidescoTool {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//model.undo();
 			}
 		});
 		
