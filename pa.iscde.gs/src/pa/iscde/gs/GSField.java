@@ -22,10 +22,20 @@ public class GSField {
 	}
 
 	public String GSField_getter(){
-		
+		String s1 = get_name().substring(0, 1).toUpperCase();
+	    String name = s1 + get_name().substring(1);
+	    
 		StringBuilder getter = new StringBuilder();
-		getter.append("\n\tpublic " + get_type() + " get_" + get_name() + 
+		getter.append("\n\tpublic " + get_type() + " get" + name + 
 				"(){\n\t\treturn "+ get_name() + ";\n\t}");
 		return getter.toString();
+	}
+	
+	public String GSField_setter(){
+		StringBuilder setter = new StringBuilder();
+		setter.append("\n\tpublic void" + " set" + get_name() + 
+				"("+ get_type() + " " + get_name() + 
+				"){\n\t\tthis."+ get_name() + " = "+ get_name() +";\n\t}");
+		return setter.toString();
 	}
 }

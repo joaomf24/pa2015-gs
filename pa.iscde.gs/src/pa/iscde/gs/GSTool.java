@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.*;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -43,7 +45,9 @@ public class GSTool implements PidescoTool {
 	private Map<Bundle, JPanel> map;
 	private WindowModel model;
 	private GSJavaReader jr;
-		
+	private StringBuilder _text_gs = new StringBuilder();
+	private ArrayList<GSField> _fields_insertion = new ArrayList<GSField>();
+	
 	@Override
 	public void run(boolean selected) {
 		jr = new GSJavaReader(GSActivator.getService());
@@ -122,30 +126,58 @@ public class GSTool implements PidescoTool {
 	
 	private JPanel createCheckBoxPanel() {
 		
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.setPreferredSize(new Dimension(200, 100));
+		JPanel panel = new JPanel(new GridLayout(20, 1));
+		//panel.setPreferredSize(new Dimension(300, 200));
 		panel.setBackground(Color.WHITE);
+		ArrayList<JCheckBox> cbList = new ArrayList<JCheckBox>();
 		
-		JCheckBox cb1 = new JCheckBox( "Test" );
-        cb1.setBackground(Color.WHITE);
+		//JCheckBox cb = null;
+		for(final GSField f : jr.get_fields()){
+			JCheckBox cb = new JCheckBox( f.get_name() );
+			cb.setBackground(Color.WHITE);
+	        cb.addActionListener(new ActionListener() {
+	        	
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(_fields_insertion.contains(f))
+						_fields_insertion.remove(f);
+					else
+						_fields_insertion.add(f);
+					System.out.println(_fields_insertion);
+				}
+			});
+	        cbList.add(cb);
+		}
+		
+        /*cb1.setBackground(Color.WHITE);
         cb1.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Entrou");
 			}
-		});
-
-	    panel.add(cb1, BorderLayout.WEST);
-	    panel.add(cb1, BorderLayout.NORTH);
+		});*/
+		if(!cbList.isEmpty()) {
+			int border = 0;
+			for(JCheckBox c : cbList){
+				//panel.add(c, new EmptyBorder(0,i*30,0,0));
+				//panel.add(c, BorderLayout.NORTH);
+				panel.add(c);
+			}
+		}
 		return panel;
 	}
 	
 	private JPanel createPaneltoString(){
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		String[] choices = { "CHOICE 1","CHOICE 2", "CHOICE 3","CHOICE 4","CHOICE 5","CHOICE 6"};
-
+		
+		ArrayList<String> mtds = new ArrayList<String>();
+		for(GSMethod mtd : jr.get_methods()){
+			mtds.add(mtd.get_method());
+		}
+		String[] choices = new String[mtds.size()];
+		choices = mtds.toArray(choices);
 	    final JComboBox<String> cb = new JComboBox<String>(choices);
 
 	    cb.setVisible(true);

@@ -8,10 +8,12 @@ public class GSMethod {
 
 	private String _name;
 	private List<Type> _parameters_type;
+	private int _line;
 	
-	public GSMethod(String name, List<Type> parameters_type){
+	public GSMethod(String name, List<Type> parameters_type, int line){
 		_name = name;
 		_parameters_type = parameters_type;
+		_line = line;
 			
 	}
 
@@ -23,6 +25,11 @@ public class GSMethod {
 		return _parameters_type;
 	}
 
+	public int get_line() {
+		return _line;
+	}
+
+	
 	public String get_method(){
 		
 		StringBuilder mtd = new StringBuilder();
