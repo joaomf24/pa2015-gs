@@ -21,6 +21,7 @@ public class GSJavaReader {
 	private ArrayList<GSMethod> _methods;
 	private File _javaFile;
 	private CompilationUnit _cu;
+	private JavaEditorServices _jes;
 	
 	public GSJavaReader(JavaEditorServices jes) {
 		_fields = new ArrayList<GSField>();
@@ -59,12 +60,18 @@ public class GSJavaReader {
 				return false;
 			}
         });
+		
 	}
 	
 	public String get_className() {
 		return _className;
 	}
 
+	public JavaEditorServices get_jes() {
+		return _jes;
+	}
+
+	
 	public Collection<GSField> get_fields() {
 		return _fields;
 	}
@@ -98,7 +105,21 @@ public class GSJavaReader {
 	public void set_cu(CompilationUnit _cu) {
 		this._cu = _cu;
 	}
+	
+	public GSMethod get_method_by_name(String name){
+		for(GSMethod mtd : get_methods()){
+			
+			if(mtd.get_method().equals(name))
+				return mtd;
+		}
+		return null;
+		
+	}
 
+	public void generateGS(JavaEditorServices jes, String s, int line){
+		jes.insertLine(jes.getOpenedFile(), s, line);
+		jes.saveFile(jes.getOpenedFile());
+	}
 	//TODO colocar o num da linha do fim do metodo
 	/*public void set_methods_line(){
 		

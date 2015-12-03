@@ -32,8 +32,11 @@ public class GSField {
 	}
 	
 	public String GSField_setter(){
+		String s1 = get_name().substring(0, 1).toUpperCase();
+	    String name = s1 + get_name().substring(1);
+		
 		StringBuilder setter = new StringBuilder();
-		setter.append("\n\tpublic void" + " set" + get_name() + 
+		setter.append("\n\tpublic void" + " set" + name + 
 				"("+ get_type() + " " + get_name() + 
 				"){\n\t\tthis."+ get_name() + " = "+ get_name() +";\n\t}");
 		return setter.toString();
