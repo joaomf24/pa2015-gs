@@ -34,6 +34,7 @@ import pa.iscde.gs.model.WindowModel;
 import pa.iscde.gs.model.WindowModel.WindowListener;
 import pa.iscde.gs.services.WindowService;
 import pt.iscte.pidesco.extensibility.PidescoTool;
+import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
 
 public class GSTool implements PidescoTool {
 
@@ -41,10 +42,11 @@ public class GSTool implements PidescoTool {
 	private JFrame window;
 	private Map<Bundle, JPanel> map;
 	private WindowModel model;
-
+	private GSJavaReader jr;
 		
 	@Override
 	public void run(boolean selected) {
+		jr = new GSJavaReader(GSActivator.getService());
 		map = new HashMap<Bundle, JPanel>();
 		model = new WindowModel();
 		window = createWindow();
@@ -52,7 +54,7 @@ public class GSTool implements PidescoTool {
 		
 	}
 	
-	private void createPanel(ServiceReference<?> ref, WindowService service) {
+	/*private void createPanel(ServiceReference<?> ref, WindowService service) {
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(service.getName()));
 		Component content = service.createContent(model);
@@ -61,7 +63,7 @@ public class GSTool implements PidescoTool {
 		window.getContentPane().add(panel);
 		window.pack();
 		window.validate();
-	}
+	}*/
 
 	
 	private JFrame createWindow() {

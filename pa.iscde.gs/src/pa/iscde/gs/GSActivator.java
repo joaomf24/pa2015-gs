@@ -31,38 +31,45 @@ import pa.iscde.gs.model.WindowCommand;
 import pa.iscde.gs.model.WindowModel;
 import pa.iscde.gs.model.WindowModel.WindowListener;
 import pa.iscde.gs.services.WindowService;
+import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
 
 
-public class Activator implements BundleActivator {
+public class GSActivator implements BundleActivator {
 
 	private BundleContext context;
-	private JFrame window;
+	private static JavaEditorServices service;
+	/*private JFrame window;
 	private Map<Bundle, JPanel> map;
-	private WindowModel model;
-
+	private WindowModel model;*/
+	
+	
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		map = new HashMap<Bundle, JPanel>();
+		/*map = new HashMap<Bundle, JPanel>();
 		model = new WindowModel();
 		window = createWindow();
-		window.setVisible(true);
-
-		String filter = "(objectclass=" + WindowService.class.getName() + ")";
+		window.setVisible(true);*/
+		String filter = "(objectclass=" + JavaEditorServices.class.getName() + ")";
 		context.addServiceListener(listener, filter);
 
-		context.addBundleListener(bundleListener);
-		Collection<ServiceReference<WindowService>> refs =
-				context.getServiceReferences(WindowService.class, null);
+		//context.addBundleListener(bundleListener);
+		Collection<ServiceReference<JavaEditorServices>> refs =
+				context.getServiceReferences(JavaEditorServices.class, null);
 
-		for(ServiceReference<WindowService> ref : refs) {
-			WindowService service = (WindowService) context.getService(ref);
-			createPanel(ref, service);
+		for(ServiceReference<JavaEditorServices> ref : refs) {
+			service = (JavaEditorServices) context.getService(ref);
+			//createPanel(ref, service);
 		}
 	}
 
 	
+	public static JavaEditorServices getService() {
+		return service;
+	}
+
+
 	public void stop(BundleContext context) throws Exception {
-		window.setVisible(false);
+		//window.setVisible(false);
 	}
 
 
@@ -71,13 +78,13 @@ public class Activator implements BundleActivator {
 		public void serviceChanged(ServiceEvent event) {
 			if(event.getType() == ServiceEvent.REGISTERED) {		
 				ServiceReference<?> ref = event.getServiceReference();
-				WindowService service = (WindowService) context.getService(ref);
-				createPanel(ref, service);
+				service = (JavaEditorServices) context.getService(ref);
+				//createPanel(ref, service);
 			}
 		}
 	};
 
-	private void createPanel(ServiceReference<?> ref, WindowService service) {
+	/*private void createPanel(ServiceReference<?> ref, WindowService service) {
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(service.getName()));
 		Component content = service.createContent(model);
@@ -86,8 +93,8 @@ public class Activator implements BundleActivator {
 		window.getContentPane().add(panel);
 		window.pack();
 		window.validate();
-	}
-
+	}*/
+/*
 
 	private BundleListener bundleListener = new BundleListener() {
 		@Override
@@ -173,6 +180,6 @@ public class Activator implements BundleActivator {
 		panel.add(button);
 		return panel;
 	}
-
+*/
 
 }
