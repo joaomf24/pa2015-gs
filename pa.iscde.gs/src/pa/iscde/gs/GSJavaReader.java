@@ -34,7 +34,9 @@ public class GSJavaReader {
 		jes.parseFile(jes.getOpenedFile(), new ASTVisitor() {
 			
 			public boolean visit(MethodDeclaration md){
-				System.out.println("-------------method: " + md.getName() + _cu.getLineNumber( md.getName().getStartPosition()));
+				System.out.println("-------------method: " + md.getName() + 
+						_cu.getLineNumber( md.getName().getStartPosition()) +
+						md.parameters().toString());
 				return false;
 			}	
 
@@ -42,7 +44,7 @@ public class GSJavaReader {
 				Object o = fd.fragments().get(0);
 				if(o instanceof VariableDeclarationFragment){
 					String s = ((VariableDeclarationFragment) o).getName().toString();
-					System.out.println("-------------field: " + s);
+					System.out.println("-------------field: " + s + fd.getType());
 				}
 
 				return false;
