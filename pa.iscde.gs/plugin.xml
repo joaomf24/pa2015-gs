@@ -2,15 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="gsview"
-         name="Getters and Setters"
-         point="pt.iscte.pidesco.view">
-      <view
-            class="pa.iscde.gs.GSView"
-            icon="gs.png">
-      </view>
-   </extension>
-   <extension
          id="gstool"
          name="Getters and Setters"
          point="pt.iscte.pidesco.tool">

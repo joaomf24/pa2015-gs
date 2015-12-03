@@ -1,60 +1,45 @@
 package pa.iscde.gs;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Label;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
-import org.osgi.framework.ServiceReference;
 
-import pa.iscde.gs.model.WindowCommand;
 import pa.iscde.gs.model.WindowModel;
 import pa.iscde.gs.model.WindowModel.WindowListener;
-import pa.iscde.gs.services.WindowService;
 import pt.iscte.pidesco.extensibility.PidescoTool;
-import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
 
 public class GSTool implements PidescoTool {
 
 	private BundleContext context;
 	private JFrame window;
-	private Map<Bundle, JPanel> map;
 	private WindowModel model;
 	private GSJavaReader jr;
 	private StringBuilder _text_gs = new StringBuilder();
 	private ArrayList<GSField> _fields_insertion = new ArrayList<GSField>();
+	private GSMethod _mtd;
 	
 	@Override
 	public void run(boolean selected) {
 		jr = new GSJavaReader(GSActivator.getService());
-		map = new HashMap<Bundle, JPanel>();
 		model = new WindowModel();
 		window = createWindow();
 		window.setVisible(true);
+		_mtd = jr.get_methods().get(0);
 		
 	}
 	
@@ -127,11 +112,9 @@ public class GSTool implements PidescoTool {
 	private JPanel createCheckBoxPanel() {
 		
 		JPanel panel = new JPanel(new GridLayout(20, 1));
-		//panel.setPreferredSize(new Dimension(300, 200));
 		panel.setBackground(Color.WHITE);
 		ArrayList<JCheckBox> cbList = new ArrayList<JCheckBox>();
 		
-		//JCheckBox cb = null;
 		for(final GSField f : jr.get_fields()){
 			JCheckBox cb = new JCheckBox( f.get_name() );
 			cb.setBackground(Color.WHITE);
@@ -143,25 +126,14 @@ public class GSTool implements PidescoTool {
 						_fields_insertion.remove(f);
 					else
 						_fields_insertion.add(f);
-					System.out.println(_fields_insertion);
 				}
 			});
 	        cbList.add(cb);
 		}
 		
-        /*cb1.setBackground(Color.WHITE);
-        cb1.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Entrou");
-			}
-		});*/
+        
 		if(!cbList.isEmpty()) {
-			int border = 0;
 			for(JCheckBox c : cbList){
-				//panel.add(c, new EmptyBorder(0,i*30,0,0));
-				//panel.add(c, BorderLayout.NORTH);
 				panel.add(c);
 			}
 		}
@@ -181,6 +153,11 @@ public class GSTool implements PidescoTool {
 	    final JComboBox<String> cb = new JComboBox<String>(choices);
 
 	    cb.setVisible(true);
+	    cb.addActionListener (new ActionListener () {
+	        public void actionPerformed(ActionEvent e) {
+	           
+	        }
+	    });
 	    Label label = new Label("Insertion point:");
 		panel.add(label);
 	    panel.add(cb);
@@ -196,6 +173,13 @@ public class GSTool implements PidescoTool {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				for(GSField f : _fields_insertion){
+					_text_gs.append(f.GSField_getter());
+					_text_gs.append(f.GSField_setter());
+				}
+				//TODO não ta a funcionar
+				GSActivator.getService().insertLine(jr.get_javaFile(), _text_gs.toString(), _mtd.get_line());
+				window.dispose();
 			}
 		});
 		JButton cancel = new JButton("Cancel");
@@ -203,6 +187,7 @@ public class GSTool implements PidescoTool {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				window.dispose();
 			}
 		});
 		

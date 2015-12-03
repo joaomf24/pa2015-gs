@@ -1,8 +1,6 @@
 package pa.iscde.gs;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,10 +45,7 @@ public class GSJavaReader {
 				List<Type> parameters = md.parameters();
 				
 				_methods.add(new GSMethod(name, parameters, line-1));
-				
-				//System.out.println("--method: " + md.getName() + 
-						//_cu.getLineNumber( md.getName().getStartPosition()) +
-						//md.parameters().toString());
+								
 				return false;
 			}	
 
@@ -59,7 +54,6 @@ public class GSJavaReader {
 				if(o instanceof VariableDeclarationFragment){
 					String s = ((VariableDeclarationFragment) o).getName().toString();
 					_fields.add(new GSField(s, fd.getType()));
-					//System.out.println("--field: " + s + fd.getType());
 				}
 
 				return false;
@@ -75,7 +69,7 @@ public class GSJavaReader {
 		return _fields;
 	}
 
-	public Collection<GSMethod> get_methods() {
+	public ArrayList<GSMethod> get_methods() {
 		return _methods;
 	}
 
