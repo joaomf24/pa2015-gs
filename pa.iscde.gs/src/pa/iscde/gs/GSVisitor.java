@@ -15,5 +15,13 @@ public abstract class GSVisitor {
 		
 	}
 	
+	public boolean visit() {
+		return true;
+	}
+	
+	public void endVisit() {
+		
+	}
+	
 	
 }

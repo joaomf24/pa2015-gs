@@ -63,6 +63,16 @@ public class GSJavaReader {
 		
 	}
 	
+	public String errorDialog(){
+		String error = "";
+		if(_javaFile == null)
+			error = "There's no file opened!";
+		else if(get_fields().isEmpty())
+			error = "There's no fields in class!";
+		
+		return error;
+	}
+	
 	public String get_className() {
 		return _className;
 	}

@@ -9,8 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,7 +21,6 @@ import org.osgi.framework.BundleContext;
 import pa.iscde.gs.model.WindowModel;
 import pa.iscde.gs.model.WindowModel.WindowListener;
 import pt.iscte.pidesco.extensibility.PidescoTool;
-import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
 
 public class GSTool implements PidescoTool {
 
@@ -44,12 +41,16 @@ public class GSTool implements PidescoTool {
 		window.setVisible(true);
 		_mtd = jr.get_methods().get(0);
 		while(window.isVisible()){
-			
-			if(_flag == 1){
-				System.out.println(_mtd.get_name());
-				jr.generateGS(GSActivator.getService(), _text_gs.toString(), _mtd.get_line());
+			if(_flag !=-1){
+				if(_flag == 1){
+					jr.generateGS(GSActivator.getService(), _text_gs.toString(), _mtd.get_line());
+				}
+				window.dispose();
+				
 			}
 		}
+		_fields_insertion.clear();
+		_text_gs = new StringBuilder();
 		_flag = -1;
 	}
 	
@@ -70,15 +71,27 @@ public class GSTool implements PidescoTool {
 		window.setLayout(new GridLayout(0,1));
 		JPanel panel = createPanel();
 		JPanel panel_checkbox = createCheckBoxPanel();
-		JPanel panel_buttons = setPanelButtons();
-		JPanel panel_tostring = createPanelInserionPoint(new GSVisitor(){
+		JPanel panel_buttons = setPanelButtons(new GSVisitor(){
 			
 			@Override
+			public boolean visit() {
+				for(GSField f : _fields_insertion){
+					if(!f.has_getter(jr.get_methods()))
+						_text_gs.append(f.GSField_getter());
+					if(!f.has_setter(jr.get_methods()))
+						_text_gs.append(f.GSField_setter());
+				}
+					
+				
+				return true;
+			}
+		});
+		JPanel panel_tostring = createPanelInserionPoint(new GSVisitor(){
+			
+			@SuppressWarnings("rawtypes")
+			@Override
 			public boolean visit(JComboBox cb) {
-				//String [] split_mtd = cb.getSelectedItem().toString().split("/(");
 				_mtd = jr.get_method_by_name(cb.getSelectedItem().toString());
-				//System.out.println(split_mtd[0]);
-				//System.out.println("Entrou" + cb.getSelectedItem());
 				return true;
 			}
 		});
@@ -136,19 +149,22 @@ public class GSTool implements PidescoTool {
 		ArrayList<JCheckBox> cbList = new ArrayList<JCheckBox>();
 		
 		for(final GSField f : jr.get_fields()){
-			JCheckBox cb = new JCheckBox( f.get_name() );
-			cb.setBackground(Color.WHITE);
-	        cb.addActionListener(new ActionListener() {
-	        	
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(_fields_insertion.contains(f))
-						_fields_insertion.remove(f);
-					else
-						_fields_insertion.add(f);
+			
+				if(!f.has_getter(jr.get_methods()) || !f.has_setter(jr.get_methods())){
+					JCheckBox cb = new JCheckBox( f.get_name() );
+					cb.setBackground(Color.WHITE);
+			        cb.addActionListener(new ActionListener() {
+			        	
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							if(_fields_insertion.contains(f))
+								_fields_insertion.remove(f);
+							else
+								_fields_insertion.add(f);
+						}
+					});
+			        cbList.add(cb);
 				}
-			});
-	        cbList.add(cb);
 		}
 		
         
@@ -175,7 +191,6 @@ public class GSTool implements PidescoTool {
 	    cb.setVisible(true);
 	    cb.addActionListener (new ActionListener () {
 	        public void actionPerformed(ActionEvent e) {
-	        	//_mtd = jr.get_method_by_name(e.getSelectedItem().toString());
 	        	v.visit(cb);
 	        }
 	    });
@@ -186,7 +201,7 @@ public class GSTool implements PidescoTool {
 	    return panel;
 		
 	}
-	private JPanel setPanelButtons(){
+	private JPanel setPanelButtons(final GSVisitor v){
 		JPanel panel = new JPanel();
 		JButton ok = new JButton("OK");
 		
@@ -194,13 +209,9 @@ public class GSTool implements PidescoTool {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				for(GSField f : _fields_insertion){
-					_text_gs.append(f.GSField_getter());
-					_text_gs.append(f.GSField_setter());
-				}
-				
+				v.visit();
 				_flag = 1;
-				window.dispose();
+				
 			}
 		});
 		JButton cancel = new JButton("Cancel");
@@ -209,7 +220,6 @@ public class GSTool implements PidescoTool {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_flag = 0;
-				window.dispose();
 			}
 		});
 		
