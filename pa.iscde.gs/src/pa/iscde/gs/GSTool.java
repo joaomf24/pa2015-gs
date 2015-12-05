@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.osgi.framework.BundleContext;
@@ -32,26 +33,31 @@ public class GSTool implements PidescoTool {
 	private ArrayList<GSField> _fields_insertion = new ArrayList<GSField>();
 	private GSMethod _mtd;
 	private int _flag = -1;
+	private boolean _tSflag = false;
 	
 	@Override
 	public void run(boolean selected) {
 		jr = new GSJavaReader(GSActivator.getService());
 		model = new WindowModel();
 		window = createWindow();
-		window.setVisible(true);
-		_mtd = jr.get_methods().get(0);
-		while(window.isVisible()){
-			if(_flag !=-1){
-				if(_flag == 1){
-					jr.generateGS(GSActivator.getService(), _text_gs.toString(), _mtd.get_line());
+		if(!jr.errorDialog().equals(""))
+			JOptionPane.showMessageDialog(window, jr.errorDialog());
+		else{
+			window.setVisible(true);
+			_mtd = jr.get_methods().get(0);
+			while(window.isVisible()){
+				if(_flag !=-1){
+					if(_flag == 1){
+						jr.generateGS(GSActivator.getService(), _text_gs.toString(), _mtd.get_line());
+					}
+					window.dispose();
+					
 				}
-				window.dispose();
-				
 			}
+			_fields_insertion.clear();
+			_text_gs = new StringBuilder();
+			_flag = -1;
 		}
-		_fields_insertion.clear();
-		_text_gs = new StringBuilder();
-		_flag = -1;
 	}
 	
 	/*private void createPanel(ServiceReference<?> ref, WindowService service) {
@@ -81,12 +87,13 @@ public class GSTool implements PidescoTool {
 					if(!f.has_setter(jr.get_methods()))
 						_text_gs.append(f.GSField_setter());
 				}
-					
+				if(_tSflag)
+					_text_gs.append(jr.generate_toString());
 				
 				return true;
 			}
 		});
-		JPanel panel_tostring = createPanelInserionPoint(new GSVisitor(){
+		JPanel panel_insertion_point = createPanelInserionPoint(new GSVisitor(){
 			
 			@SuppressWarnings("rawtypes")
 			@Override
@@ -95,8 +102,10 @@ public class GSTool implements PidescoTool {
 				return true;
 			}
 		});
+		JPanel panel_tostring = createPaneltoString();
 		panel.add(panel_checkbox);
 		panel.add(panel_tostring);
+		panel.add(panel_insertion_point);
 		panel.add(panel_buttons);
 		window.getContentPane().add(panel);
 		window.setSize(400, 600);
@@ -151,7 +160,7 @@ public class GSTool implements PidescoTool {
 		for(final GSField f : jr.get_fields()){
 			
 				if(!f.has_getter(jr.get_methods()) || !f.has_setter(jr.get_methods())){
-					JCheckBox cb = new JCheckBox( f.get_name() );
+					JCheckBox cb = new JCheckBox( f.get_name() + " : " + f.get_type() );
 					cb.setBackground(Color.WHITE);
 			        cb.addActionListener(new ActionListener() {
 			        	
@@ -196,6 +205,24 @@ public class GSTool implements PidescoTool {
 	    });
 	    Label label = new Label("Insertion point:");
 		panel.add(label);
+	    panel.add(cb);
+	    
+	    return panel;
+		
+	}
+	private JPanel createPaneltoString(){
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		
+		JCheckBox cb = new JCheckBox("Generate toString() for Class fields" );
+        cb.addActionListener(new ActionListener() {
+        	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				_tSflag = !_tSflag;
+			}
+		});
+        
 	    panel.add(cb);
 	    
 	    return panel;

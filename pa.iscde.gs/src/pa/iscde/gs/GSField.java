@@ -81,4 +81,10 @@ public class GSField {
 		return ret;
 		
 	}
+
+	@Override
+	public String toString() {
+		return "GSField [_name=" + _name + ", _type=" + _type + ", _getter_name=" + _getter_name + ", _setter_name="
+				+ _setter_name + "]";
+	}
 }
