@@ -57,6 +57,7 @@ public class GSTool implements PidescoTool {
 			_fields_insertion.clear();
 			_text_gs = new StringBuilder();
 			_flag = -1;
+			_tSflag = false;
 		}
 	}
 	
@@ -87,7 +88,7 @@ public class GSTool implements PidescoTool {
 					if(!f.has_setter(jr.get_methods()))
 						_text_gs.append(f.GSField_setter());
 				}
-				if(_tSflag)
+				if(_tSflag && !jr.has_toString())
 					_text_gs.append(jr.generate_toString());
 				
 				return true;
@@ -98,7 +99,10 @@ public class GSTool implements PidescoTool {
 			@SuppressWarnings("rawtypes")
 			@Override
 			public boolean visit(JComboBox cb) {
-				_mtd = jr.get_method_by_name(cb.getSelectedItem().toString());
+				if(!cb.getSelectedItem().toString().equals("End of Class"))
+					_mtd = jr.get_method_by_name(cb.getSelectedItem().toString());
+				/*else
+				TODO	_mtd.set_line(last_line);*/
 				return true;
 			}
 		});
@@ -108,7 +112,7 @@ public class GSTool implements PidescoTool {
 		panel.add(panel_insertion_point);
 		panel.add(panel_buttons);
 		window.getContentPane().add(panel);
-		window.setSize(400, 600);
+		window.setSize(400, 700);
 		window.setLocation(300 , 0 );
 		window.addComponentListener(new ComponentListener() {
 
@@ -193,6 +197,7 @@ public class GSTool implements PidescoTool {
 		for(GSMethod mtd : jr.get_methods()){
 			mtds.add(mtd.get_method());
 		}
+		mtds.add("End of Class");
 		String[] choices = new String[mtds.size()];
 		choices = mtds.toArray(choices);
 	    final JComboBox<String> cb = new JComboBox<String>(choices);
@@ -212,7 +217,7 @@ public class GSTool implements PidescoTool {
 	}
 	private JPanel createPaneltoString(){
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		
 		JCheckBox cb = new JCheckBox("Generate toString() for Class fields" );
         cb.addActionListener(new ActionListener() {
@@ -222,7 +227,10 @@ public class GSTool implements PidescoTool {
 				_tSflag = !_tSflag;
 			}
 		});
-        
+        if(jr.has_toString()){
+	    	cb.setEnabled(false);
+	    	cb.setSelected(true);
+        }
 	    panel.add(cb);
 	    
 	    return panel;

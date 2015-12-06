@@ -126,6 +126,18 @@ public class GSJavaReader {
 		return sb.toString();
 		
 	}
+	
+	public boolean has_toString(){
+		boolean ret = false;
+		
+		for(GSMethod mtd : get_methods()){
+			ret = mtd.istoString();
+			if(ret) break;
+		}
+		
+		return ret;
+		
+	}
 	//TODO colocar o num da linha do fim do metodo
 	/*public void set_methods_line(){
 		

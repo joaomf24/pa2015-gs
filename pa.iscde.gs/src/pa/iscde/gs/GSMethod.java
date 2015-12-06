@@ -29,6 +29,14 @@ public class GSMethod {
 		return _line;
 	}
 
+	public void set_line(int _line) {
+		this._line = _line;
+	}
+
+	public boolean istoString(){
+		return get_name().equals("toString");
+		
+	}
 	
 	public String get_method(){
 		
