@@ -7,14 +7,16 @@ import org.eclipse.jdt.core.dom.Type;
 public class GSField {
 
 	private String _name;
+	private String _field_declaration;
 	private Type _type;
 	private String _getter_name;
 	private String _setter_name;
 	
-	public GSField(String name, Type type){
+	public GSField(String name, String field_declaration, Type type){
 		String s1 = name.substring(0, 1).toUpperCase();
 	    String n= s1 + name.substring(1);
 		_name = name;
+		_field_declaration = field_declaration;
 		_type = type;
 		_getter_name = "get" + n;
 		_setter_name = "set" + n;
@@ -35,6 +37,15 @@ public class GSField {
 
 	public String get_setter_name() {
 		return _setter_name;
+	}
+	
+	public String get_field_declaration() {
+		return _field_declaration;
+	}
+
+	public boolean isFinal(){
+		return get_field_declaration().contains("final");
+		
 	}
 
 	public String GSField_getter(){
@@ -81,10 +92,5 @@ public class GSField {
 		return ret;
 		
 	}
-
-	@Override
-	public String toString() {
-		return "GSField [_name=" + _name + ", _type=" + _type + ", _getter_name=" + _getter_name + ", _setter_name="
-				+ _setter_name + "]";
-	}
+	
 }

@@ -62,7 +62,7 @@ public class GSJavaReader {
 					Object o = fd.fragments().get(0);
 					if(o instanceof VariableDeclarationFragment){
 						String s = ((VariableDeclarationFragment) o).getName().toString();
-						_fields.add(new GSField(s, fd.getType()));
+						_fields.add(new GSField(s, fd.toString(), fd.getType()));
 					}
 	
 					return false;
@@ -108,7 +108,10 @@ public class GSJavaReader {
 	}
 
 	public void generateGS(JavaEditorServices jes, String s, int line){
-		jes.insertLine(jes.getOpenedFile(), s, line);
+		if(line == -1)
+			jes.insertTextAtCursor(s);
+		else
+			jes.insertLine(jes.getOpenedFile(), s, line);
 		jes.saveFile(jes.getOpenedFile());
 	}
 	
@@ -138,24 +141,5 @@ public class GSJavaReader {
 		return ret;
 		
 	}
-	//TODO colocar o num da linha do fim do metodo
-	/*public void set_methods_line(){
-		
-		for(int i = 0; i<get_methods().size(); i++){
-			int line = 0;
-			GSMethod mtd = ((ArrayList<GSMethod>) get_methods()).get(i);
-			GSMethod mtd_ant;
-			if(i == 0)
-				line = mtd.get_line();
-			else{
-				
-				get_methods()).get(i);
-				
-			}
-			mtd_ant = ((ArrayList<GSMethod>) get_methods()).get(i);
-			
-		}
-		
-		
-	}*/
+	
 }

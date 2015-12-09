@@ -6,8 +6,6 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -17,17 +15,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.osgi.framework.BundleContext;
-
-import pa.iscde.gs.model.WindowModel;
-import pa.iscde.gs.model.WindowModel.WindowListener;
 import pt.iscte.pidesco.extensibility.PidescoTool;
 
 public class GSTool implements PidescoTool {
 
-	private BundleContext context;
 	private JFrame window;
-	private WindowModel model;
 	private GSJavaReader jr;
 	private StringBuilder _text_gs = new StringBuilder();
 	private ArrayList<GSField> _fields_insertion = new ArrayList<GSField>();
@@ -38,20 +30,24 @@ public class GSTool implements PidescoTool {
 	@Override
 	public void run(boolean selected) {
 		jr = new GSJavaReader(GSActivator.getService());
-		model = new WindowModel();
 		window = createWindow();
 		if(!jr.errorDialog().equals(""))
 			JOptionPane.showMessageDialog(window, jr.errorDialog());
 		else{
 			window.setVisible(true);
-			_mtd = jr.get_methods().get(0);
+			_mtd = null;
+	        
 			while(window.isVisible()){
+				System.out.println("");
 				if(_flag !=-1){
 					if(_flag == 1){
-						jr.generateGS(GSActivator.getService(), _text_gs.toString(), _mtd.get_line());
+						if(_mtd == null)
+							jr.generateGS(GSActivator.getService(), _text_gs.toString(), -1);
+						else
+							jr.generateGS(GSActivator.getService(), _text_gs.toString(), _mtd.get_line());
 					}
 					window.dispose();
-					
+					break;
 				}
 			}
 			_fields_insertion.clear();
@@ -60,18 +56,6 @@ public class GSTool implements PidescoTool {
 			_tSflag = false;
 		}
 	}
-	
-	/*private void createPanel(ServiceReference<?> ref, WindowService service) {
-		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createTitledBorder(service.getName()));
-		Component content = service.createContent(model);
-		panel.add(content);
-		map.put(ref.getBundle(), panel);
-		window.getContentPane().add(panel);
-		window.pack();
-		window.validate();
-	}*/
-
 	
 	private JFrame createWindow() {
 		final JFrame window = new JFrame("Getters and Setters");
@@ -85,7 +69,7 @@ public class GSTool implements PidescoTool {
 				for(GSField f : _fields_insertion){
 					if(!f.has_getter(jr.get_methods()))
 						_text_gs.append(f.GSField_getter());
-					if(!f.has_setter(jr.get_methods()))
+					if(!f.has_setter(jr.get_methods()) && !f.isFinal())
 						_text_gs.append(f.GSField_setter());
 				}
 				if(_tSflag && !jr.has_toString())
@@ -99,10 +83,10 @@ public class GSTool implements PidescoTool {
 			@SuppressWarnings("rawtypes")
 			@Override
 			public boolean visit(JComboBox cb) {
-				if(!cb.getSelectedItem().toString().equals("End of Class"))
+				if(!cb.getSelectedItem().toString().equals("Cursor position"))
 					_mtd = jr.get_method_by_name(cb.getSelectedItem().toString());
-				/*else
-				TODO	_mtd.set_line(last_line);*/
+				else
+					_mtd = null;
 				return true;
 			}
 		});
@@ -113,8 +97,8 @@ public class GSTool implements PidescoTool {
 		panel.add(panel_buttons);
 		window.getContentPane().add(panel);
 		window.setSize(400, 700);
-		window.setLocation(300 , 0 );
-		window.addComponentListener(new ComponentListener() {
+		window.setLocation(300 , 0);
+		/*window.addComponentListener(new ComponentListener() {
 
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -135,13 +119,8 @@ public class GSTool implements PidescoTool {
 			public void componentHidden(ComponentEvent e) {
 
 			}
-		});
-		model.addListener(new WindowListener() {	
-			@Override
-			public void positionChanged(int x, int y) {
-				window.setLocation(x, y);		
-			}
-		});
+		});*/
+		
 		return window;
 	}
 
@@ -150,7 +129,6 @@ public class GSTool implements PidescoTool {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		Label label = new Label("Select Getters and Setters to create");
 		panel.add(label);
-		
 		
 		return panel;
 	}
@@ -163,24 +141,23 @@ public class GSTool implements PidescoTool {
 		
 		for(final GSField f : jr.get_fields()){
 			
-				if(!f.has_getter(jr.get_methods()) || !f.has_setter(jr.get_methods())){
-					JCheckBox cb = new JCheckBox( f.get_name() + " : " + f.get_type() );
-					cb.setBackground(Color.WHITE);
-			        cb.addActionListener(new ActionListener() {
-			        	
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if(_fields_insertion.contains(f))
-								_fields_insertion.remove(f);
-							else
-								_fields_insertion.add(f);
-						}
-					});
-			        cbList.add(cb);
-				}
+			if(!f.has_getter(jr.get_methods()) || (!f.has_setter(jr.get_methods()) && !f.isFinal())){
+				JCheckBox cb = new JCheckBox( f.get_name() + " : " + f.get_type() );
+				cb.setBackground(Color.WHITE);
+		        cb.addActionListener(new ActionListener() {
+		        	
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(_fields_insertion.contains(f))
+							_fields_insertion.remove(f);
+						else
+							_fields_insertion.add(f);
+					}
+				});
+		        cbList.add(cb);
+			}
 		}
 		
-        
 		if(!cbList.isEmpty()) {
 			for(JCheckBox c : cbList){
 				panel.add(c);
@@ -194,10 +171,11 @@ public class GSTool implements PidescoTool {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
 		ArrayList<String> mtds = new ArrayList<String>();
+		mtds.add("Cursor position");
 		for(GSMethod mtd : jr.get_methods()){
 			mtds.add(mtd.get_method());
 		}
-		mtds.add("End of Class");
+		
 		String[] choices = new String[mtds.size()];
 		choices = mtds.toArray(choices);
 	    final JComboBox<String> cb = new JComboBox<String>(choices);
@@ -255,6 +233,7 @@ public class GSTool implements PidescoTool {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_flag = 0;
+				
 			}
 		});
 		
@@ -262,10 +241,6 @@ public class GSTool implements PidescoTool {
 		panel.add(cancel);
 		
 		return panel;
-		
-		
 	}
-	
-	
 	
 }
