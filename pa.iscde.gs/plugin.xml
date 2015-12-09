@@ -6,7 +6,7 @@
          name="Getters and Setters"
          point="pt.iscte.pidesco.tool">
       <tool
-            class="pa.iscde.gs.GSTool"
+            class="pa.iscde.generator.internal.GSTool"
             description="Generate Getters and Setters"
             icon="gs.png"
             hasState="false"
