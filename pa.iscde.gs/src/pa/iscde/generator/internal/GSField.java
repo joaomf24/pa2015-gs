@@ -72,7 +72,6 @@ public class GSField {
 		
 		for(GSMethod mtd : mtdList){
 			ret = get_getter_name().contains(mtd.get_method());
-			
 			if(ret) break;
 		}
 		
@@ -85,7 +84,6 @@ public class GSField {
 		
 		for(GSMethod mtd : mtdList){
 			ret = get_setter_name().contains(mtd.get_method());
-			System.out.println(get_setter_name() + " " + mtd.get_method());
 			if(ret) break;
 		}
 		
