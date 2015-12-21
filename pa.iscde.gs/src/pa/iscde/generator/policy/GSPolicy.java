@@ -1,5 +1,7 @@
 package pa.iscde.generator.policy;
 
+import org.eclipse.jdt.core.dom.Type;
+
 public interface GSPolicy {
 
 	boolean isUpperCase(String s);
@@ -8,7 +10,7 @@ public interface GSPolicy {
 	
 	boolean isSetter(String s);
 	
-	String generateGetterName(String field);
+	String generateGetterName(String field, Type returnType);
 	
-	String generateSetterName(String field);
+	String generateSetterName(String field, Type returnType);
 }

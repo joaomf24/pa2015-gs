@@ -18,8 +18,8 @@ public class GSField {
 	
 	public GSField(String name, String field_declaration, Type type){
 		 policy = new GSPolicyImpl();
-		_getter_name = policy.generateGetterName(name);
-		_setter_name = policy.generateSetterName(name);
+		_getter_name = policy.generateGetterName(name, type);
+		_setter_name = policy.generateSetterName(name, type);
 		
 		_name = name;
 		_field_declaration = field_declaration;
@@ -53,23 +53,17 @@ public class GSField {
 	}
 
 	public String GSField_getter(){
-		String s1 = get_name().substring(0, 1).toUpperCase();
-	    String name = s1 + get_name().substring(1);
 	    
 		StringBuilder getter = new StringBuilder();
-		getter.append("\n\tpublic " + get_type() + " get" + name + 
-				"(){\n\t\treturn "+ get_name() + ";\n\t}");
+		getter.append("\n\t"+ get_getter_name() +"{\n\t\treturn "+ get_name() + ";\n\t}");
 		return getter.toString();
 	}
 	
 	public String GSField_setter(){
-		String s1 = get_name().substring(0, 1).toUpperCase();
-	    String name = s1 + get_name().substring(1);
 		
 		StringBuilder setter = new StringBuilder();
-		setter.append("\n\tpublic void" + " set" + name + 
-				"("+ get_type() + " " + get_name() + 
-				"){\n\t\tthis."+ get_name() + " = "+ get_name() +";\n\t}");
+		setter.append("\n\t"+ get_setter_name() + 
+				"{\n\t\tthis."+ get_name() + " = "+ get_name() +";\n\t}");
 		return setter.toString();
 	}
 	
@@ -77,7 +71,8 @@ public class GSField {
 		boolean ret = false;
 		
 		for(GSMethod mtd : mtdList){
-			ret = mtd.get_method().contains(get_getter_name());
+			ret = get_getter_name().contains(mtd.get_method());
+			
 			if(ret) break;
 		}
 		
@@ -89,7 +84,8 @@ public class GSField {
 		boolean ret = false;
 		
 		for(GSMethod mtd : mtdList){
-			ret = mtd.get_method().contains(get_setter_name());
+			ret = get_setter_name().contains(mtd.get_method());
+			System.out.println(get_setter_name() + " " + mtd.get_method());
 			if(ret) break;
 		}
 		

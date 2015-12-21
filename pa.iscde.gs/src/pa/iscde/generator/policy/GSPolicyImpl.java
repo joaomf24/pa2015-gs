@@ -1,5 +1,7 @@
 package pa.iscde.generator.policy;
 
+import org.eclipse.jdt.core.dom.Type;
+
 public class GSPolicyImpl implements GSPolicy {
 	
 	public GSPolicyImpl(){}
@@ -20,21 +22,22 @@ public class GSPolicyImpl implements GSPolicy {
 	}
 
 	@Override
-	public String generateGetterName(String field) {
+	public String generateGetterName(String field, Type returnType) {
 		if(field == null)
 			return null;
 		String s1 = field.substring(0, 1).toUpperCase();
 	    String n = s1 + field.substring(1);
-		return "get" + n;
+		return "public " + returnType + " get" + n + "()";
 	}
 
 	@Override
-	public String generateSetterName(String field) {
+	public String generateSetterName(String field, Type argType) {
 		if(field == null)
 			return null;
 		String s1 = field.substring(0, 1).toUpperCase();
 	    String n = s1 + field.substring(1);
-		return "set" + n;
+		return "public void set" + n + "("+ argType + " " + field + 
+				")";
 	}
 
 }
